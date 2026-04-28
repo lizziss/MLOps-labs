@@ -15,3 +15,4 @@ models/*.pkl
 .ipynb_checkpoints
 .vscode/
 .DS_Store
+mlflow.db
