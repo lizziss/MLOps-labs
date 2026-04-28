@@ -7,8 +7,8 @@ venv/
 *.joblib
 mlruns/
 mlartifacts/
-/data/raw/*
-/data/processed/*
+data/raw/*.csv
+data/processed/*.csv
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 models/*.pkl
