@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from pathlib import Path
 import joblib
 import numpy as np
@@ -7,20 +8,23 @@ from .schemas import IrisFeatures, PredictionResponse
 MODEL_PATH = Path(__file__).resolve().parent.parent / "model.joblib"
 CLASS_NAMES = ["setosa", "versicolor", "virginica"]
 
-app = FastAPI(
-    title="Iris ML API",
-    description="REST API для  Iris",
-    version="1.0.0",
-)
-
 model = None
 
-@app.on_event("startup")
-def load_model() -> None:
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     global model
     if not MODEL_PATH.exists():
         raise RuntimeError(f"Model file not found: {MODEL_PATH}")
     model = joblib.load(MODEL_PATH)
+    yield  
+    model = None 
+
+app = FastAPI(
+    title="Iris ML API",
+    description="REST API для  Iris",
+    version="1.0.0",
+    lifespan=lifespan,
+)
 
 @app.get("/")
 def root() -> dict:
