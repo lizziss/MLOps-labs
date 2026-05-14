@@ -1,6 +1,0 @@
-# lab2/.gitignore
-.venv/
-model.joblib
-__pycache__/
-
-.pytest_cache/

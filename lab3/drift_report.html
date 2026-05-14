@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Data Drift Report — Iris ML API</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  body { font-family: Arial, sans-serif; background: #f5f6fa; margin: 0; padding: 20px; }
+  .container { max-width: 900px; margin: auto; }
+  h1 { color: #2c3e50; }
+  .summary { background: white; border-radius: 8px; padding: 20px;
+              margin-bottom: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+  .feature-card { background: white; border-radius: 8px; padding: 20px;
+                   margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+  .feature-card.drift { border-left: 5px solid #e74c3c; }
+  .feature-card.ok    { border-left: 5px solid #27ae60; }
+  .stats-row { display: flex; gap: 16px; margin: 12px 0; }
+  .stat-box { background: #f8f9fa; border-radius: 6px; padding: 12px;
+               flex: 1; font-size: 14px; }
+  .stat-box.alert { background: #fff5f5; border: 1px solid #e74c3c; }
+  .badge-red   { background:#e74c3c; color:white; padding:4px 12px;
+                  border-radius:4px; font-size:16px; font-weight:bold; }
+  .badge-green { background:#27ae60; color:white; padding:4px 12px;
+                  border-radius:4px; font-size:16px; font-weight:bold; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th, td { padding:10px; border-bottom:1px solid #eee; text-align:left; }
+  th { background:#f0f3f7; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📊 Data Drift Report — Iris ML API</h1>
+
+  <div class="summary">
+    <h2>Загальний результат: <span class="badge-red">DRIFT DETECTED</span></h2>
+    <p>Перевірено ознак: <b>4</b> &nbsp;|&nbsp;
+       Виявлено drift: <b>1</b> &nbsp;|&nbsp;
+       Поріг значущості α = 0.05</p>
+    <table>
+      <tr><th>Ознака</th><th>KS Statistic</th><th>p-value</th><th>Результат</th></tr>
+      <tr>
+        <td>sepal_length</td>
+        <td>0.0467</td>
+        <td>0.994547</td>
+        <td>✓ OK</td>
+      </tr><tr>
+        <td>sepal_width</td>
+        <td>0.035</td>
+        <td>0.999959</td>
+        <td>✓ OK</td>
+      </tr><tr>
+        <td>petal_length</td>
+        <td>0.395</td>
+        <td>0.0</td>
+        <td>⚠ Drift</td>
+      </tr><tr>
+        <td>petal_width</td>
+        <td>0.0517</td>
+        <td>0.982743</td>
+        <td>✓ OK</td>
+      </tr>
+    </table>
+  </div>
+
+  <h2>Розподіли ознак (Reference vs Current)</h2>
+  
+    <div class="feature-card ok">
+        <h3>sepal_length <span style="color:#27ae60;font-weight:bold">✓ OK</span></h3>
+        <div class="stats-row">
+            <div class="stat-box">
+                <b>Reference</b><br>
+                Mean: 5.8417<br>
+                Std:  0.8409
+            </div>
+            <div class="stat-box">
+                <b>Current</b><br>
+                Mean: 5.7815<br>
+                Std:  0.8371
+            </div>
+            <div class="stat-box ">
+                <b>KS Test</b><br>
+                Statistic: 0.0467<br>
+                p-value: 0.994547
+            </div>
+        </div>
+        <canvas id="chart_sepal_length" width="600" height="200"></canvas>
+        <script>
+        (function(){
+            var ctx = document.getElementById('chart_sepal_length').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [np.float64(4.39), np.float64(4.57), np.float64(4.75), np.float64(4.93), np.float64(5.109999999999999), np.float64(5.29), np.float64(5.470000000000001), np.float64(5.65), np.float64(5.83), np.float64(6.01), np.float64(6.1899999999999995), np.float64(6.37), np.float64(6.550000000000001), np.float64(6.73), np.float64(6.91), np.float64(7.09), np.float64(7.27), np.float64(7.45), np.float64(7.630000000000001), np.float64(7.8100000000000005)],
+                    datasets: [
+                        {
+                            label: 'Reference',
+                            data: [2, 4, 7, 12, 9, 4, 10, 12, 9, 5, 7, 13, 2, 9, 3, 2, 3, 1, 5, 1],
+                            backgroundColor: 'rgba(52,152,219,0.5)',
+                            borderColor: 'rgba(52,152,219,1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Current',
+                            data: [7, 9, 11, 11, 20, 6, 12, 16, 22, 4, 16, 19, 7, 0, 17, 6, 3, 5, 2, 7],
+                            backgroundColor: 'rgba(231,76,60,0.4)',
+                            borderColor: 'rgba(231,76,60,1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: false,
+                    plugins: { title: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        })();
+        </script>
+    </div>
+    
+    <div class="feature-card ok">
+        <h3>sepal_width <span style="color:#27ae60;font-weight:bold">✓ OK</span></h3>
+        <div class="stats-row">
+            <div class="stat-box">
+                <b>Reference</b><br>
+                Mean: 3.0483<br>
+                Std:  0.4485
+            </div>
+            <div class="stat-box">
+                <b>Current</b><br>
+                Mean: 3.0575<br>
+                Std:  0.4369
+            </div>
+            <div class="stat-box ">
+                <b>KS Test</b><br>
+                Statistic: 0.035<br>
+                p-value: 0.999959
+            </div>
+        </div>
+        <canvas id="chart_sepal_width" width="600" height="200"></canvas>
+        <script>
+        (function(){
+            var ctx = document.getElementById('chart_sepal_width').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [np.float64(2.06), np.float64(2.18), np.float64(2.3000000000000003), np.float64(2.42), np.float64(2.54), np.float64(2.66), np.float64(2.7800000000000002), np.float64(2.9000000000000004), np.float64(3.02), np.float64(3.14), np.float64(3.2600000000000002), np.float64(3.3800000000000003), np.float64(3.5000000000000004), np.float64(3.6200000000000006), np.float64(3.74), np.float64(3.8600000000000003), np.float64(3.9800000000000004), np.float64(4.1000000000000005), np.float64(4.220000000000001), np.float64(4.34)],
+                    datasets: [
+                        {
+                            label: 'Reference',
+                            data: [1, 3, 3, 2, 7, 13, 13, 7, 17, 9, 15, 9, 6, 3, 7, 2, 0, 1, 1, 1],
+                            backgroundColor: 'rgba(52,152,219,0.5)',
+                            borderColor: 'rgba(52,152,219,1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Current',
+                            data: [2, 6, 2, 2, 10, 13, 14, 18, 11, 28, 37, 6, 19, 4, 7, 5, 5, 8, 0, 3],
+                            backgroundColor: 'rgba(231,76,60,0.4)',
+                            borderColor: 'rgba(231,76,60,1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: false,
+                    plugins: { title: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        })();
+        </script>
+    </div>
+    
+    <div class="feature-card drift">
+        <h3>petal_length <span style="color:#e74c3c;font-weight:bold">⚠ DRIFT</span></h3>
+        <div class="stats-row">
+            <div class="stat-box">
+                <b>Reference</b><br>
+                Mean: 3.77<br>
+                Std:  1.7685
+            </div>
+            <div class="stat-box">
+                <b>Current</b><br>
+                Mean: 5.1365<br>
+                Std:  1.7935
+            </div>
+            <div class="stat-box alert">
+                <b>KS Test</b><br>
+                Statistic: 0.395<br>
+                p-value: 0.0
+            </div>
+        </div>
+        <canvas id="chart_petal_length" width="600" height="200"></canvas>
+        <script>
+        (function(){
+            var ctx = document.getElementById('chart_petal_length').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [np.float64(1.245), np.float64(1.5350000000000001), np.float64(1.8250000000000002), np.float64(2.115), np.float64(2.4050000000000002), np.float64(2.6950000000000003), np.float64(2.9850000000000003), np.float64(3.2750000000000004), np.float64(3.5650000000000004), np.float64(3.8550000000000004), np.float64(4.1450000000000005), np.float64(4.4350000000000005), np.float64(4.7250000000000005), np.float64(5.015000000000001), np.float64(5.305000000000001), np.float64(5.595000000000001), np.float64(5.885000000000001), np.float64(6.175000000000001), np.float64(6.465000000000001), np.float64(6.755000000000001)],
+                    datasets: [
+                        {
+                            label: 'Reference',
+                            data: [7, 29, 4, 0, 0, 0, 1, 0, 4, 3, 12, 11, 8, 14, 5, 8, 6, 3, 2, 3],
+                            backgroundColor: 'rgba(52,152,219,0.5)',
+                            borderColor: 'rgba(52,152,219,1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Current',
+                            data: [15, 54, 4, 0, 0, 0, 2, 0, 8, 3, 14, 19, 20, 20, 12, 9, 10, 3, 2, 5],
+                            backgroundColor: 'rgba(231,76,60,0.4)',
+                            borderColor: 'rgba(231,76,60,1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: false,
+                    plugins: { title: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        })();
+        </script>
+    </div>
+    
+    <div class="feature-card ok">
+        <h3>petal_width <span style="color:#27ae60;font-weight:bold">✓ OK</span></h3>
+        <div class="stats-row">
+            <div class="stat-box">
+                <b>Reference</b><br>
+                Mean: 1.205<br>
+                Std:  0.7627
+            </div>
+            <div class="stat-box">
+                <b>Current</b><br>
+                Mean: 1.1575<br>
+                Std:  0.7852
+            </div>
+            <div class="stat-box ">
+                <b>KS Test</b><br>
+                Statistic: 0.0517<br>
+                p-value: 0.982743
+            </div>
+        </div>
+        <canvas id="chart_petal_width" width="600" height="200"></canvas>
+        <script>
+        (function(){
+            var ctx = document.getElementById('chart_petal_width').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [np.float64(0.16), np.float64(0.27999999999999997), np.float64(0.39999999999999997), np.float64(0.52), np.float64(0.6399999999999999), np.float64(0.76), np.float64(0.8799999999999999), np.float64(1.0), np.float64(1.12), np.float64(1.2400000000000002), np.float64(1.3599999999999999), np.float64(1.48), np.float64(1.6), np.float64(1.7200000000000002), np.float64(1.8399999999999999), np.float64(1.96), np.float64(2.08), np.float64(2.2), np.float64(2.3200000000000003), np.float64(2.44)],
+                    datasets: [
+                        {
+                            label: 'Reference',
+                            data: [25, 6, 7, 1, 1, 0, 0, 5, 2, 5, 17, 10, 3, 1, 8, 10, 6, 1, 7, 5],
+                            backgroundColor: 'rgba(52,152,219,0.5)',
+                            borderColor: 'rgba(52,152,219,1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Current',
+                            data: [52, 6, 14, 0, 1, 0, 0, 11, 3, 9, 19, 19, 8, 1, 11, 11, 10, 3, 14, 8],
+                            backgroundColor: 'rgba(231,76,60,0.4)',
+                            borderColor: 'rgba(231,76,60,1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: false,
+                    plugins: { title: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        })();
+        </script>
+    </div>
+    
+</div>
+</body>
+</html>
