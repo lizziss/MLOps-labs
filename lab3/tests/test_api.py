@@ -1,10 +1,10 @@
 import pytest
 from fastapi.testclient import TestClient
 from ml.train import train_and_save
-from app.main import app, MODEL_PATH
+from app.main import app, MODEL_PATH, REFERENCE_PATH 
 
-if not MODEL_PATH.exists():
-    train_and_save(MODEL_PATH)
+if not MODEL_PATH.exists() or not REFERENCE_PATH.exists():
+    train_and_save(MODEL_PATH, REFERENCE_PATH)
 
 @pytest.fixture
 def client():
